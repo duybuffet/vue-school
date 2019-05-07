@@ -2,7 +2,7 @@
   <div class="post-list">
     <div class="post">
       <div class="user-info">
-        <a href="#" class="user-name" v-bind="user.name"></a>
+        <a href="#" class="user-name" v-bind="user.name">{{user.name}}</a>
 
         <a href="#">
           <img class="avatar-large" :src="user.avatar" alt>
@@ -26,7 +26,7 @@
   </div>
 </template>
 <script>
-import sourceData from '@/data'
+import {countObjectProperties} from '@/utils'
 export default {
   props: {
     post: {
@@ -37,11 +37,11 @@ export default {
 
   computed: {
     user () {
-      return sourceData.users[this.post.userId]
+      return this.$store.state.users[this.post.userId]
     },
 
     userPostsCount () {
-      return Object.keys(this.user.posts).length
+      return countObjectProperties(this.user.posts)
     }
   }
 }
