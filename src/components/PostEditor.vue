@@ -11,7 +11,8 @@
       ></textarea>
     </div>
     <div class="form-actions">
-      <button class="btn-blue">Submit post</button>
+      <button class="btn btn-ghost" v-if="isUpdate" @click.prevent="cancel">Cancel</button>
+      <button class="btn-blue">{{isUpdate ? 'Update' : 'Submit post'}}</button>
     </div>
   </form>
 </template>
@@ -20,25 +21,64 @@
 export default {
   props: {
     threadId: {
-      required: true
+      required: false
+    },
+
+    post: {
+      type: Object,
+      validator: obj => {
+        const keyIsValid = typeof obj['.key'] === 'string'
+        const textIsValid = typeof obj['text'] === 'string'
+        return keyIsValid && textIsValid
+      }
     }
   },
 
   data () {
     return {
-      text: ''
+      text: this.post ? this.post.text : ''
+    }
+  },
+
+  computed: {
+    isUpdate () {
+      return !!this.post
     }
   },
 
   methods: {
     save () {
+      this.persist()
+        .then(post => {
+          this.$emit('save', {post})
+        })
+    },
+
+    cancel () {
+      this.$emit('cancel')
+    },
+
+    create () {
       const post = {
         text: this.text,
         threadId: this.threadId
       }
 
       this.text = ''
-      this.$store.dispatch('createPost', post)
+
+      return this.$store.dispatch('createPost', post)
+    },
+
+    update () {
+      const payload = {
+        id: this.post['.key'],
+        text: this.text
+      }
+      return this.$store.dispatch('updatePost', payload)
+    },
+
+    persist () {
+      return (this.isUpdate ? this.update() : this.create())
     }
   }
 }
