@@ -46,6 +46,10 @@ export default {
       return countObjectProperties(this.thread.posts) - 1
     },
 
+    threadsCount () {
+      return this.$store.state.userThreadsCount(this.user['.key'])
+    },
+
     user () {
       return this.$store.state.users[this.thread.userId]
     }
